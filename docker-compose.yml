@@ -1,0 +1,78 @@
+# composeファイルのバージョン
+version: '3'
+# アプリケーションを動かすための各要素
+services:
+  db:
+    build: ./docker/mysql/
+    environment:
+      MYSQL_DATABASE: root
+      # rootユーザに空のパスワードを設定してコンテナを起動することを許可
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      TZ: 'Asia/Tokyo'
+    ports:
+      - 3306:3306
+    volumes:
+      # 初期データを投入するSQLが格納されているdir
+      - ./docker/mysql/mysql_init:/docker-entrypoint-initdb.d
+      # 永続化するときにマウントするdir
+      - ./docker/mysql/mysql_data:/var/lib/mysql
+
+  app:
+    build: .
+    command: /bin/sh -c "rm -f /app/tmp/pids/server.pid && bash /opt/entrypoint.sh"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 3306
+      DATABASE_USER: root
+      RAILS_ENV: development
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    links:
+      - db
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/app
+
+  nginx:
+    build: ./docker/nginx/
+    ports:
+      - 8090:80
+    links:
+      - app
+      - fluentd
+
+  fluentd:
+    build: ./docker/fluentd/
+    volumes:
+      - ./docker/fluentd/config:/fluentd/etc
+      - ./docker/nginx/log:/var/log/nginx
+    links:
+      - elasticsearch
+    ports:
+      - 24224:24224
+    depends_on:
+      - elasticsearch
+
+  elasticsearch:
+    build: ./docker/elasticsearch/
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - 9200:9200
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./docker/elasticsearch/data:/usr/share/elasticsearch/data
+
+  kibana:
+    build: ./docker/kibana/
+    ports:
+      - 5601:5601
+    links:
+      - elasticsearch:elasticsearch

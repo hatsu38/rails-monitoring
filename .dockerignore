@@ -1,0 +1,10 @@
+docker/
+!/docker/mysql/
+master.key
+spec/
+tmp/
+!tmp/pids/
+node_modules/
+vendor/bundle/
+.env
+.DS_Store
