@@ -1,7 +1,8 @@
 #!/bin/bash
+set -e
 
-cd /app
+# Remove a potentially pre-existing server.pid for Rails.
+rm -f /app/tmp/pids/server.pid
 
-rm -f ./tmp/pids/server.pid
-
-RAILS_ENV=${RAILS_ENV:-development} bundle exec rails server -b 0.0.0.0
+# Then exec the container's main process (what's set as CMD in the Dockerfile).
+exec "$@"
