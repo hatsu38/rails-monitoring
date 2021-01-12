@@ -1,5 +1,5 @@
 # composeファイルのバージョン
-version: '3'
+version: '3.3'
 # アプリケーションを動かすための各要素
 services:
   db:
@@ -19,7 +19,7 @@ services:
 
   app:
     build: .
-    command: /bin/sh -c "rm -f /app/tmp/pids/server.pid && bash /opt/entrypoint.sh"
+    command: /bin/sh -c "rm -f /app/tmp/pids/server.pid && bundle exec rails s"
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: 3306
@@ -29,17 +29,22 @@ services:
       - 3000:3000
     expose:
       - 3000
-    links:
+    depends_on:
       - db
     tty: true
     stdin_open: true
     volumes:
       - .:/app
+      - tmp-data:/app/tmp/sockets
 
   nginx:
     build: ./docker/nginx/
+    command: "nginx -g 'daemon off;'"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+      - tmp-data:/app/tmp/sockets
     ports:
-      - 8090:80
+      - 80:80
     links:
       - app
       - fluentd
@@ -60,6 +65,8 @@ services:
     build: ./docker/elasticsearch/
     environment:
       - discovery.type=single-node
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - 9200:9200
@@ -76,3 +83,5 @@ services:
       - 5601:5601
     links:
       - elasticsearch:elasticsearch
+volumes:
+    tmp-data:
