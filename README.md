@@ -1,24 +1,11 @@
-# README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Nginx × Rails × MySQL × Fluentd × Elasticsearch × Kibana
 
-Things you may want to cover:
+![Image](https://user-images.githubusercontent.com/16137809/104429333-d7f65f80-55c8-11eb-9f20-81ea36226fcb.png)
 
-* Ruby version
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## Development
+1. git clone git@github.com:hatsu38/rails-monitoring.git
+2. docker-compose up --build
+3. http://localhost ← Rails App
+4. http://localhost:5601 ← Kibana Access
