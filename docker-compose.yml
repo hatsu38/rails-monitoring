@@ -31,6 +31,7 @@ services:
       - 3000
     depends_on:
       - db
+      - fluentd
     tty: true
     stdin_open: true
     volumes:
@@ -45,15 +46,19 @@ services:
       - tmp-data:/app/tmp/sockets
     ports:
       - 80:80
-    links:
+    depends_on:
       - app
       - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "nginx"
+        fluentd-async-connect: "true"
 
   fluentd:
     build: ./docker/fluentd/
     volumes:
-      - ./docker/fluentd/config:/fluentd/etc
-      - ./docker/nginx/log:/var/log/nginx
+      - ./docker/fluentd/config/fluent.conf:/fluentd/etc/fluent.conf
     links:
       - elasticsearch
     ports:
