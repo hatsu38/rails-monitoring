@@ -1,12 +1,9 @@
-# composeファイルのバージョン
-version: '3.3'
-# アプリケーションを動かすための各要素
+version: "3.7"
 services:
   db:
     build: ./docker/mysql/
     environment:
       MYSQL_DATABASE: root
-      # rootユーザに空のパスワードを設定してコンテナを起動することを許可
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       TZ: Asia/Tokyo
     expose:
