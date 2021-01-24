@@ -27,7 +27,9 @@ services:
     depends_on:
       - db
       - fluentd
+    #ポート待受していないコンテナがすぐ終了してしまうのを防ぐ
     tty: true
+    # コンテナの標準に入力をオープンにする
     stdin_open: true
     volumes:
       - .:/app
@@ -35,6 +37,7 @@ services:
 
   nginx:
     build: ./docker/nginx/
+    # Nginxをforegroundで動かすため、daemonをoff
     command: nginx -g 'daemon off;'
     volumes:
       - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
@@ -45,9 +48,11 @@ services:
       - app
       - fluentd
     logging:
+      # ロギング（ログ保存）ドライバをfluentdが行う
       driver: fluentd
       options:
         tag: nginx
+        # 初期接続をブロックしない
         fluentd-async-connect: "true"
 
   fluentd:
