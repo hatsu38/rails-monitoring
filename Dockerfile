@@ -10,8 +10,7 @@ RUN apt-get update -qq && \
 ENV APP_ROOT /app
 WORKDIR $APP_ROOT
 
-# gem のバージョンが変わった場合、ビルドし直せるように、ここで変更を検知する。
-COPY Gemfile Gemfile.lock package.json yarn.lock $APP_ROOT/
+COPY Gemfile Gemfile.lock $APP_ROOT/
 
 RUN gem update --system && gem install bundler:2.1.4
 
