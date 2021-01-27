@@ -55,15 +55,6 @@ services:
         # 初期接続をブロックしない
         fluentd-async-connect: "true"
 
-  fluentd:
-    build: ./docker/fluentd/
-    volumes:
-      - ./docker/fluentd/config/fluent.conf:/fluentd/etc/fluent.conf
-    ports:
-      - 24224:24224
-    depends_on:
-      - elasticsearch
-
   elasticsearch:
     build: ./docker/elasticsearch/
     environment:
@@ -75,6 +66,15 @@ services:
       - 9200:9200
     volumes:
       - ./docker/elasticsearch/data:/usr/share/elasticsearch/data
+
+  fluentd:
+    build: ./docker/fluentd/
+    volumes:
+      - ./docker/fluentd/fluent.conf:/fluentd/etc/fluent.conf
+    ports:
+      - 24224:24224
+    depends_on:
+      - elasticsearch
 
   kibana:
     build: ./docker/kibana/
