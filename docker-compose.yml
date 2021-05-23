@@ -29,10 +29,8 @@ services:
     depends_on:
       - db
       - fluentd
-    #ポート待受していないコンテナがすぐ終了してしまうのを防ぐ
-    tty: true
-    # コンテナの標準に入力をオープンにする
-    stdin_open: true
+    tty: true # ポート待受していないコンテナがすぐ終了してしまうのを防ぐ
+    stdin_open: true # コンテナの標準に入力をオープンにする
     volumes:
       - .:/app
       - tmp-data:/app/tmp/sockets
